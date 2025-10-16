@@ -1,24 +1,37 @@
-import React, { createContext, useState } from "react";
-import type { ReactNode } from "react";
+import { createContext, useState, useEffect, type ReactNode } from "react";
 
-
-interface AuthContextType {
-  user: string | null;
-  login: (user: string) => void;
+interface SessionContextProps {
+  user: { username: string; rol: number } | null;
   logout: () => void;
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const SessionContext = createContext<SessionContextProps>({
+  user: null,
+  logout: () => {},
+});
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<string | null>(null);
+export const SessionProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<{ username: string; rol: number } | null>(null);
 
-  const login = (username: string) => setUser(username);
-  const logout = () => setUser(null);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const username = localStorage.getItem("username");
+    const rol = localStorage.getItem("rol");
+
+    if (token && username && rol) {
+      setUser({ username, rol: Number(rol) });
+    }
+  }, []);
+
+  const logout = () => {
+    localStorage.clear();
+    setUser(null);
+    window.location.href = "/";
+  };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <SessionContext.Provider value={{ user, logout }}>
       {children}
-    </AuthContext.Provider>
+    </SessionContext.Provider>
   );
 };
