@@ -1,5 +1,5 @@
-import { useState, type ReactNode } from "react";
-import "./Login.css";
+import { useState, type ReactNode, useEffect } from "react";
+import "../components/styles/Login.css";
 import Logo from "../assets/Residential.svg";
 import EyeOpen from "../assets/visibility.svg";
 import EyeClosed from "../assets/visibility_off.svg";
@@ -11,13 +11,15 @@ const Login = (): ReactNode => {
   const [cedula, setCedula] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [showFloatingMessage, setShowFloatingMessage] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const handleLogin = async () => {
     setMessage("");
+    setShowFloatingMessage(false);
 
     if (!cedula || !password) {
-      setMessage("⚠️ Por favor completa todos los campos.");
+      showMessage("⚠️ Por favor completa todos los campos.");
       return;
     }
 
@@ -34,15 +36,20 @@ const Login = (): ReactNode => {
         localStorage.setItem("token", response.data.access_token);
         localStorage.setItem("userCedula", cedula);
         localStorage.setItem("rol", response.data.rol.toString());
-
-        setMessage("✅ Inicio de sesión exitoso.");
-        setIsLoggedIn(true);
+        showMessage("✅ Inicio de sesión exitoso.", true);
+        setTimeout(() => setIsLoggedIn(true), 1200);
       } else {
-        setMessage("❌ Credenciales incorrectas. Intenta de nuevo.");
+        showMessage("❌ Credenciales incorrectas. Intenta de nuevo.");
       }
-    } catch (error: any) {
-      setMessage("❌ Error en el inicio de sesión. Verifica tus datos.");
+    } catch {
+      showMessage("❌ Error en el inicio de sesión. Verifica tus datos.");
     }
+  };
+
+  const showMessage = (msg: string, success = false) => {
+    setMessage(msg);
+    setShowFloatingMessage(true);
+    setTimeout(() => setShowFloatingMessage(false), 3000);
   };
 
   if (isLoggedIn) {
@@ -51,15 +58,24 @@ const Login = (): ReactNode => {
 
   return (
     <div className="login-container">
+      {/* Mensaje flotante arriba */}
+      {showFloatingMessage && (
+        <div
+          className={`floating-message ${
+            message.includes("✅") ? "success" : "error"
+          }`}
+        >
+          {message}
+        </div>
+      )}
+
       <div className="login-card">
-        <div className="login-logo">
+        <div className="login-left">
           <img src={Logo} alt="Residential Logo" className="logo-img" />
         </div>
 
-        <div className="login-form">
+        <div className="login-right">
           <h2>Iniciar Sesión</h2>
-
-          {message && <p className="login-message">{message}</p>}
 
           <div className="input-group">
             <label htmlFor="cedula">Número de cédula</label>
@@ -72,7 +88,7 @@ const Login = (): ReactNode => {
             />
           </div>
 
-          <div className="input-group password-group">
+          <div className="input-group">
             <label htmlFor="password">Contraseña</label>
             <div className="password-wrapper">
               <input
