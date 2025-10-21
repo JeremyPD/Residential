@@ -1,45 +1,72 @@
 import React, { useState } from "react";
-import { Home, Building2, LogOut } from "lucide-react";
-import "./Dashboard.css";
+import { Home, Building2, LogOut, Users } from "lucide-react";
+import "../../components/styles/Dashboard.css";
+import "../../components/styles/Asambleas.css";
+import "../../components/styles/Casas.css";
 import Asambleas from "./Asambleas";
 import Casas from "./Casas";
+import Usuarios from "./Usuarios";
 
-const Dashboard: React.FC = () => {
+const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("asambleas");
+
+  const handleLogout = () => {
+    localStorage.clear();
+    window.location.reload();
+  };
 
   return (
     <div className="dashboard-container">
-      <aside className="sidebar">
+      <header className="topbar">
+        <h2>
+          {activeTab === "asambleas"
+            ? "Asambleas"
+            : activeTab === "casas"
+            ? "Casas"
+            : "Usuarios"}
+        </h2>
+      </header>
+
+      <aside className="sidebar glass">
         <ul className="menu">
           <li
-            className={`menu-item ${activeTab === "asambleas" ? "active" : ""}`}
+            className={`menu-item ${
+              activeTab === "asambleas" ? "active" : ""
+            }`}
             onClick={() => setActiveTab("asambleas")}
           >
             <Building2 className="icon" /> Asambleas
           </li>
+
           <li
             className={`menu-item ${activeTab === "casas" ? "active" : ""}`}
             onClick={() => setActiveTab("casas")}
           >
             <Home className="icon" /> Casas
           </li>
+
+          <li
+            className={`menu-item ${activeTab === "usuarios" ? "active" : ""}`}
+            onClick={() => setActiveTab("usuarios")}
+          >
+            <Users className="icon" /> Usuarios
+          </li>
         </ul>
 
-        <div className="logout">
-          <LogOut className="icon" />
-          <span>Cerrar sesión</span>
+        <div className="bottom-section">
+          <button className="logout-btn" onClick={handleLogout}>
+            <LogOut className="icon" />
+            Cerrar sesión
+          </button>
         </div>
       </aside>
 
-      <div className="main-area">
-        <header className="topbar">
-          <h2>{activeTab === "asambleas" ? "Asambleas" : "Casas"}</h2>
-        </header>
-
-        <main className="main-content">
-          {activeTab === "asambleas" ? <Asambleas /> : <Casas />}
-        </main>
-      </div>
+      {/* === Contenido principal === */}
+      <main className="main-content glass">
+        {activeTab === "asambleas" && <Asambleas />}
+        {activeTab === "casas" && <Casas />}
+        {activeTab === "usuarios" && <Usuarios />}
+      </main>
     </div>
   );
 };

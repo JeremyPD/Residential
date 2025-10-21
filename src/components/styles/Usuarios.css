@@ -1,0 +1,75 @@
+.usuarios-container {
+  width: 100%;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  font-family: "Inter", sans-serif;
+}
+
+.usuarios-header {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 15px;
+}
+
+.add-user-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 6px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.add-user-btn:hover {
+  background-color: #0056b3;
+}
+
+.usuarios-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.usuarios-table th {
+  background-color: #f7f7f7;
+  padding: 10px;
+  font-weight: 600;
+  color: #555;
+  border: 1px solid #ddd;
+}
+
+.usuarios-table td {
+  padding: 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 10px;
+}
+
+.edit-btn,
+.delete-btn {
+  background: none;
+  border: none;
+  color: #444;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.edit-btn:hover {
+  color: #007bff;
+}
+
+.delete-btn:hover {
+  color: #ff3b30;
+}

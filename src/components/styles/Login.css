@@ -1,0 +1,285 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+body {
+  background:
+    linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(30, 30, 30, 0.7)),
+    url("../assets/casas.jpg") no-repeat center center fixed;
+  background-size: cover;
+  position: relative;
+  font-family: "Inter", sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(6px);
+  z-index: -1;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-size: 300% 300%;
+  animation: gradientShift 12s ease infinite;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* {Tarjeta general} */
+.login-card {
+  display: flex;
+  border-radius: 25px;
+  overflow: hidden;
+  width: 950px;
+  height: 520px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+}
+
+/* = LADO IZQUIERDO = */
+.login-left {
+  width: 45%;
+  background: linear-gradient(135deg, #000000, #1a1a1a, #2b2b2b);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-img {
+  width: 350px;
+  filter: brightness(1.2);
+}
+
+/* = LADO DERECHO = */
+.login-right {
+  width: 55%;
+  background: #D9D9D9;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 60px;
+}
+
+.login-right h2 {
+  color: #1e1e1e;
+  font-size: 36px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+/* = INPUTS = */
+.input-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group label {
+  font-size: 15px;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  background: #D9D9D9;
+  font-size: 15px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.input-group input:focus {
+  border-color: #111;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+/* = CONTRASEÑA = */
+.password-wrapper {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: none;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.toggle-password:hover {
+  opacity: 1;
+}
+
+.toggle-password img {
+  padding-top: 6px;
+  width: 22px;
+}
+
+/* {BOTÓN PRINCIPAL} */
+.login-btn {
+  margin-top: 20px;
+  padding: 12px 0;
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  background: #111;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.login-btn:hover {
+  background: #333;
+  transform: translateY(-2px);
+}
+
+/* MENSAJES DE ALERTA*/
+.message-box {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 12px;
+  padding: 10px 15px;
+  width: 100%;
+  margin-bottom: 18px;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+/* Error */
+.message-error {
+  background: rgba(255, 76, 76, 0.1);
+  color: #d93025;
+  border: 1px solid rgba(255, 76, 76, 0.3);
+  box-shadow: 0 0 6px rgba(255, 76, 76, 0.2);
+}
+
+.message-error::before {
+  content: "⚠️ ";
+}
+
+/* Éxito */
+.message-success {
+  background: rgba(76, 175, 80, 0.1);
+  color: #1b5e20;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  box-shadow: 0 0 6px rgba(76, 175, 80, 0.2);
+}
+
+.message-success::before {
+  content: "✅ ";
+}
+
+/* Animación suave */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === RESPONSIVO === */
+@media (max-width: 768px) {
+  .login-card {
+    flex-direction: column;
+    width: 90%;
+    height: auto;
+  }
+
+  .login-left {
+    width: 100%;
+    height: 200px;
+  }
+
+  .login-right {
+    width: 100%;
+    padding: 30px 40px;
+  }
+}
+/* {MENSAJE FLOTANTE SUPERIOR} */
+.floating-message {
+  position: fixed;
+  top: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 14px 22px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #1a4fd9;
+  background: rgba(0, 85, 255, 0.15);
+  border: 1.5px solid rgba(0, 85, 255, 0.6);
+  box-shadow: 0 4px 12px rgba(0, 85, 255, 0.3);
+  text-align: center;
+  animation: slideDown 0.4s ease-out, fadeOut 0.5s ease-in 2.5s forwards;
+  z-index: 9999;
+}
+
+/* Éxito */
+.floating-message.success {
+  background: rgba(0, 255, 150, 0.15);
+  border: 1.5px solid rgba(0, 255, 150, 0.6);
+  color: #008f5a;
+  box-shadow: 0 4px 12px rgba(0, 255, 150, 0.3);
+}
+
+/* Error */
+.floating-message.error {
+  background: rgba(255, 76, 76, 0.15);
+  border: 1.5px solid rgba(255, 76, 76, 0.6);
+  color: #d93025;
+  box-shadow: 0 4px 12px rgba(255, 76, 76, 0.3);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translate(-50%, -15px);
+  }
+}
+

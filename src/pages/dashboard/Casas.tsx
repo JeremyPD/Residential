@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
+import "../../components/styles/Casas.css";
 
 interface Casa {
   id: string;
@@ -13,6 +14,8 @@ const Casas: React.FC = () => {
   const [casas, setCasas] = useState<Casa[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<string | null>(null);
+  const [notification, setNotification] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editData, setEditData] = useState({
@@ -22,22 +25,25 @@ const Casas: React.FC = () => {
     celular: "",
   });
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
-    const fetchCasas = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get<Casa[]>("http://127.0.0.1:3000/house", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setCasas(response.data);
-      } catch (err: any) {
-        setError(err.response?.data?.message || "Error al cargar las casas");
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchCasas();
   }, []);
+
+  const fetchCasas = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get<Casa[]>("http://127.0.0.1:3000/house", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCasas(response.data);
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Error al cargar las casas");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleEditClick = (casa: Casa) => {
     setEditData({
@@ -61,7 +67,8 @@ const Casas: React.FC = () => {
       const token = localStorage.getItem("token");
 
       if (!editData.id) {
-        alert("Error: falta el ID de la casa.");
+        setNotification({ type: "error", message: "Error: falta el ID de la casa." });
+        setTimeout(() => setNotification(null), 4000);
         return;
       }
 
@@ -90,10 +97,92 @@ const Casas: React.FC = () => {
       );
 
       setIsModalOpen(false);
-      alert("✅ Casa actualizada correctamente");
+      setNotification({ type: "success", message: "Casa actualizada correctamente" });
+      setTimeout(() => setNotification(null), 4000);
     } catch (error: any) {
       console.error(error);
-      alert("❌ Error al actualizar la casa");
+      setNotification({ type: "error", message: "Error al actualizar la casa" });
+      setTimeout(() => setNotification(null), 4000);
+    }
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validTypes = [
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.ms-excel",
+    ];
+
+    if (!validTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls)$/i)) {
+      setNotification({ type: "error", message: "Por favor selecciona un archivo Excel válido (.xlsx o .xls)" });
+      setTimeout(() => setNotification(null), 4000);
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setNotification({ type: "error", message: "El archivo es muy grande. Tamaño máximo: 5MB" });
+      setTimeout(() => setNotification(null), 4000);
+      return;
+    }
+
+    setUploadProgress("Subiendo archivo...");
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setNotification({ type: "error", message: "No hay token de autenticación. Inicia sesión nuevamente." });
+        setTimeout(() => setNotification(null), 4000);
+        setUploadProgress(null);
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await axios.post<Casa[]>(
+        "http://127.0.0.1:3000/house/excel",
+        formData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setUploadProgress("✅ Archivo cargado exitosamente. Actualizando tabla...");
+
+      if (Array.isArray(response.data) && response.data.length > 0) {
+        setCasas((prev) => [...prev, ...response.data]);
+      } else {
+        await fetchCasas();
+      }
+
+      setTimeout(() => {
+        setUploadProgress(null);
+        setNotification({ type: "success", message: "Excel cargado exitosamente" });
+        setTimeout(() => setNotification(null), 4000);
+      }, 1000);
+    } catch (error: any) {
+      console.error("Error al subir archivo Excel:", error);
+      setUploadProgress(null);
+
+      let message = "Error al cargar el archivo Excel.";
+      if (error.response?.data?.message) {
+        message = error.response.data.message;
+      } else if (error.response?.data?.error) {
+        message = error.response.data.error;
+      }
+
+      setNotification({ type: "error", message: ` ${message}` });
+      setTimeout(() => setNotification(null), 4000);
+    }
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -102,6 +191,44 @@ const Casas: React.FC = () => {
 
   return (
     <div className="casas-view">
+      {notification && (
+        <div className={`excel-notification ${notification.type}`}>
+          {notification.message}
+        </div>
+      )}
+
+      <div className="table-header">
+        <h2>Gestión de Casas</h2>
+        <div className="header-actions">
+          <button className="upload-btn" onClick={handleUploadClick}>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            Cargar Excel
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={handleFileChange}
+            style={{ display: "none" }}
+          />
+        </div>
+      </div>
+
+      {uploadProgress && <div className="upload-notification">{uploadProgress}</div>}
+
       <div className="table-container">
         <table className="casas-table">
           <thead>
@@ -128,8 +255,8 @@ const Casas: React.FC = () => {
                       title="Editar casa"
                     >
                       <svg
-                        width="16"
-                        height="16"
+                        width="20"
+                        height="20"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
@@ -166,7 +293,6 @@ const Casas: React.FC = () => {
             <div className="modal-divider"></div>
 
             <div className="modal-content">
-
               <div className="form-group">
                 <label className="form-label">Nombre</label>
                 <input
